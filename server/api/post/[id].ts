@@ -1,13 +1,28 @@
-export default defineEventHandler((event) => {
+import { posts, type Post } from "../../utils/posts";
+
+export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id");
 
-  const posts = [
-    { id: 1, title: "First Post", body: "This is the first post." },
-    { id: 2, title: "Second Post", body: "This is the second post." },
-    { id: 3, title: "Third Post", body: "This is the third post." },
-  ];
+  if (!id || Number.isNaN(Number(id))) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid post id",
+    });
+  }
 
-  const post = posts.find((p) => p.id === Number(id));
+  const sleep = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  await sleep(2000);
+
+  const post = posts.find((item: Post) => item.id === Number(id));
+
+  if (!post) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Post not found",
+    });
+  }
 
   return post;
 });
